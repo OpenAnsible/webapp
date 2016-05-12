@@ -38,5 +38,6 @@ OpenAnsible Web Application
 
 *   `JQuery <https://jquery.com/>`_ , A fast, small, and feature-rich JavaScript library. It makes things like HTML document traversal and manipulation, event handling, animation, and Ajax much simpler with an easy-to-use API that works across a multitude of browsers
 *   `React <https://facebook.github.io/react/>`_ , A JavaScript Library For Building User Interfaces
+*	`WebRTC adapter <https://github.com/webrtc/adapter>`_ , A shim to insulate apps from spec changes and prefix differences.
 *   `WebRTC <https://webrtc.org/>`_ , A free, open project that provides browsers and mobile applications with Real-Time Communications (RTC) capabilities via simple APIs
 
