@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="assets/css/common.css" type="text/css" />
     <link rel="stylesheet" href="assets/css/main.css"   type="text/css" />
 
+    <!-- WebRTC 跨浏览器API兼容库 -->
+    <script type="text/javascript" src="/assets/js/adapter-latest.js"></script>
+
     <script type="text/javascript" src="/assets/js/jquery/jquery-1.12.3.min.js"></script>
     <script type="text/javascript" src="/assets/react/react.js"></script>
     <script type="text/javascript" src="/assets/react/react-with-addons.js"></script>
@@ -21,14 +24,16 @@
     <!-- React Components -->
     <!-- <script type="text/javascript" src="/assets/react/build/index/app.js"></script> -->
 
+    <!-- <script type="text/javascript" src="/assets/js/test.js"></script> -->
+
     <script type="text/javascript">
         $(function (){
             // init
             if ( !window.App ) return;
             ReactDOM.render(
                 React.createElement(window.App, {} ), 
-                // document.getElementById("container")
-                document.getElementsByTagName('body')[0]
+                document.getElementById("container")
+                // document.getElementsByTagName('body')[0]
             );
         });
     </script>
@@ -38,12 +43,13 @@
 <body>
     <h1> It Works! </h1>
 
-    <div class="container">
+    <div id="container">
         <!-- React Application -->
     </div>
 
-    <div >
-
+    <div id"test">
+        <video id="localVideo" autoplay loop />
+    </div>
 </body>
 
 </html>
