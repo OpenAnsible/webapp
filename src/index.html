@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="utf-8" />
+    <meta name="keywords" 
+            content="OpenAnsible, Ansible, WebRTC, LiveCast, WebLive, WebCast, Zhibo, Chat" />
+    <meta name="description" content="OpenAnsible Web Application." />
+
+    <title>OpenAnsible Web Application</title>
+    
+    <link rel="stylesheet" href="assets/css/common.css" type="text/css" />
+    <link rel="stylesheet" href="assets/css/main.css"   type="text/css" />
+
+    <script type="text/javascript" src="/assets/js/jquery/jquery-1.12.3.min.js"></script>
+    <script type="text/javascript" src="/assets/react/react.js"></script>
+    <script type="text/javascript" src="/assets/react/react-with-addons.js"></script>
+    <script type="text/javascript" src="/assets/react/react-dom.js"></script>
+    <script type="text/javascript" src="/assets/react/react-dom-server.js"></script>
+    <script type="text/javascript">
+        $(function (){
+            // init
+            if ( !window.App ) return;
+            ReactDOM.render(
+                React.createElement(window.App, {} ), 
+                // document.getElementById("container")
+                document.getElementsByTagName('body')[0]
+            );
+        });
+    </script>
+
+</head>
+
+<body>
+    <h1> It Works! </h1>
+    
+    <div class="container">
+        <!-- React Application -->
+    </div>
+
+</body>
+
+</html>
