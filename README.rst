@@ -29,6 +29,8 @@ OpenAnsible Web Application
 .. code:: bash
     
     cd webapp/src
+    python -m SimpleHTTPServer
+    # Or 
     bash run.sh
 
 
