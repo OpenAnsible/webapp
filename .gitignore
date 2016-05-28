@@ -64,3 +64,5 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+node_modules
+src/assets/build
