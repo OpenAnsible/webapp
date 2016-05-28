@@ -1,4 +1,8 @@
-var Panel = React.createClass({
+
+if (!window.components) window.components = {};
+
+
+window.components.Panel = React.createClass({
    render:function(){
        return (
           <div className="panel panel-primary"> 
