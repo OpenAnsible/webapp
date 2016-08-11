@@ -27,7 +27,9 @@ Mac OS X 系统:
 
 **安装Slimit:**
 
->   `Slimit` 是基于 `Python` 编写的用于压缩 `JavaScript` 代码库。
+
+    `Slimit` 是基于 `Python` 编写的用于压缩 `JavaScript` 代码库。
+
 
 .. code:: bash
     
