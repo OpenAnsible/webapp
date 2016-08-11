@@ -91,3 +91,15 @@ Develop
 *   `WebRTC adapter <https://github.com/webrtc/adapter>`_ , A shim to insulate apps from spec changes and prefix differences.
 *   `WebRTC <https://webrtc.org/>`_ , A free, open project that provides browsers and mobile applications with Real-Time Communications (RTC) capabilities via simple APIs
 
+
+参考
+-------
+
+*   `Elm Documentation <http://elm-lang.org/docs>`_
+*   `Elm Community <http://elm-lang.org/community>`_
+*   `Elm Example <http://elm-lang.org/examples>`_
+*   `Elm Package <http://package.elm-lang.org/>`_
+
+*   `Elm Tutorial <http://www.elm-tutorial.org/>`_
+*   `An Introduction to Elm <https://www.gitbook.com/book/evancz/an-introduction-to-elm/details>`_
+
