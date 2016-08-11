@@ -1,7 +1,8 @@
 
 
-import Html exposing (div, button, text)
+import Html exposing (div, button, text, h1, span)
 import Html.App exposing (beginnerProgram)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 
 
@@ -10,11 +11,16 @@ main =
 
 
 view model =
-  div []
-    [ button [ onClick Decrement ] [ text "-" ]
-    , div [] [ text (toString model) ]
-    , button [ onClick Increment ] [ text "+" ]
-
+    div [class ""] [ 
+        h1 [] [text "OpenAnsible Web Application"],
+        div [class "panel panel-default"] [
+            div [class "panel-heading"] [text "Button Test"],
+            div [class "panel-body"] [
+                button [ onClick Decrement, class "btn btn-primary" ] [ text "-" ],
+                span [] [ text (toString model) ],
+                button [ onClick Increment, class "btn btn-danger" ] [ text "+" ]
+            ]
+        ]
     ]
 
 
