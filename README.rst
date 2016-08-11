@@ -14,6 +14,8 @@ OpenAnsible Web Application
 Install
 ----------------------------
 
+**安装Elm:**
+
 Mac OS X 系统:
 
 .. code:: bash
@@ -23,6 +25,17 @@ Mac OS X 系统:
 其它系统以及安装方式:
 
 More: `Install <http://elm-lang.org/install>`_
+
+**安装Slimit:**
+
+    `Slimit` 是基于 `Python` 编写的用于压缩 `JavaScript` 代码库。
+
+
+.. code:: bash
+    
+    pip2 install slimit
+
+
 
 安装完成之后，在命令行里面输入:
 
@@ -34,6 +47,7 @@ More: `Install <http://elm-lang.org/install>`_
     elm-reactor
     elm-doc
     elm-repl
+
 
 
 如果上述命令都存在，那恭喜你，安装完成了～
