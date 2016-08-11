@@ -22,14 +22,12 @@ Mac OS X 系统:
     
     brew install elm
 
-其它系统以及安装方式:
+其它系统以及安装方式: `More <http://elm-lang.org/install>`_
 
-More: `Install <http://elm-lang.org/install>`_
 
 **安装Slimit:**
 
-    `Slimit` 是基于 `Python` 编写的用于压缩 `JavaScript` 代码库。
-
+>   `Slimit` 是基于 `Python` 编写的用于压缩 `JavaScript` 代码库。
 
 .. code:: bash
     
