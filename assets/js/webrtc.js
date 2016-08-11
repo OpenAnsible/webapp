@@ -13,14 +13,43 @@
 // input.catch(function (error){
 //     console.error(error);
 // });
+function MixMedia(){
+    // 混音器（包括视频）
+    this.name   = "Mix Media";
+    this.stream = null;
+}
+MixMedia.prototype.addVideoTrack = function (){
 
+};
+MixMedia.prototype.addAudioTrack = function (){
 
-function WebRTC(ice_server){
+};
+
+function Device(device){
+    this.name    = "Device";
+    this.version = "0.1";
+    this.device = device || null;
+}
+Device.prototype.capture = function (callback){
+    navigator.mediaDevices.getUserMedia({video: "default"}).then(function (stream){
+        // console.log(stream);
+        var localVideo = document.getElementById('localVideo');
+        localVideo.src = window.URL.createObjectURL(stream);
+    });
+};
+
+function WebRTC(ice_servers){
+    // ice_servers : Array
     this.name    = "WebRTC";
     this.version = "0.1";
 
+    // { iceServers: [
+    //     { urls: "stun:stun.services.mozilla.com", username: "louis@mozilla.com", credential: "webrtcdemo" },
+    //     { urls: ["stun:stun.example.com", "stun:stun-1.example.com"] }
+    //   ]
+    // };
 
-    this.ice_server = ice_server || null;
+    this.ice_servers = ice_servers || [ {"urls": ["stun:127.0.0.1:9000"] } ];
     this.devices    = [];
     this.connection = null;
     // 初始化数据
@@ -40,12 +69,13 @@ WebRTC.prototype.get_media_devices = function (){
         // NOTE: Devices 数据结构需要改成对象，
         //       用户根据 this.devices[0].take_picture() 之类的 API 来获取硬件资源.
         self.devices = media_devices.map(function (device){
-            return {
-                "deviceId": device.deviceId,
-                "groupId" : device.groupId,
-                "kind"    : device.kind,
-                "label"   : device.label
-            };
+            return new Device(device);
+            // return {
+            //     "deviceId": device.deviceId,
+            //     "groupId" : device.groupId,
+            //     "kind"    : device.kind,
+            //     "label"   : device.label
+            // };
         });
     }).catch(function (error){
         // devices = []
@@ -53,8 +83,8 @@ WebRTC.prototype.get_media_devices = function (){
     // Note: 以上代码的 `then` 使用异步调用了底层 API，所以此处无法 return 回去列表。
 };
 WebRTC.prototype._new_peer_connection = function (){
-    this.connection = new RTCPeerConnection(this.ice_server);
-    // add event
+    this.connection = new RTCPeerConnection({"iceServers": this.ice_servers });
+    // bind event
     this.connection.onaddstream = this.onaddstream;
 
 };
@@ -81,9 +111,13 @@ WebRTC.prototype._create_sdp = function (){
         console.error(error);
     });
 };
+WebRTC.prototype.addStream = function (stream){
+
+};
+
 
 // Bind Event
 WebRTC.prototype.onaddstream = function (evt){
     // evt: { stream: stream }
-
+    // localVideo.src = window.URL.createObjectURL(evt.stream);
 };

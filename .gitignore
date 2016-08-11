@@ -1,6 +1,10 @@
 # Project setting
 samples/
-src/assets/js/test.js
+assets/js/test.js
+elm-stuff/
+assets/js/elm.js
+assets/js/elm.min.js
+assets/js/elm.min.js.gz
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
