@@ -19,7 +19,7 @@ $(STATIC_JS)/elm.min.js.gz: $(STATIC_JS)/elm.min.js
 $(STATIC_JS)/elm.min.js: $(STATIC_JS)/elm.js
 	$(SLIMIT) $(STATIC_JS)/elm.js > $(STATIC_JS)/elm.min.js
 
-$(STATIC_JS)/elm.js: $(ELM_SRC)/Main.elm
+$(STATIC_JS)/elm.js: $(ELM_SRC)/*.elm $(ELM_SRC)/Views/*.elm
 	$(ELM) $(ELM_SRC)/Main.elm --output=$(STATIC_JS)/elm.js
 
 .PHONY: clean

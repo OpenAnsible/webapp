@@ -7,7 +7,8 @@ import Html.Events exposing (onClick)
 
 import Debug
 import Navigation
-import Hop exposing (matcherToPath, matchUrl, makeUrl, makeUrlFromLocation, clearQuery, removeQuery, setQuery, addQuery)
+import Hop exposing (matcherToPath, matchUrl, makeUrl, makeUrlFromLocation, 
+    clearQuery, removeQuery, setQuery, addQuery)
 import Hop.Matchers exposing (match1, match2, match3, match4, nested1, nested2)
 import Hop.Types exposing (Config, Location, Query, Router, PathMatcher, newLocation, newQuery)
 

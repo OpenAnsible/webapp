@@ -4,7 +4,8 @@ module Routes exposing (..)
 import Navigation
 import Hop.Types
 import Hop.Matchers exposing (match1, match2, match3, match4, nested1, nested2)
-import Hop exposing (matcherToPath, matchUrl, makeUrl, makeUrlFromLocation, clearQuery, removeQuery, setQuery, addQuery)
+import Hop exposing (matcherToPath, matchUrl, makeUrl, makeUrlFromLocation, 
+    clearQuery, removeQuery, setQuery, addQuery)
 
 type Route = HomeRoute | AboutRoute | NotFoundRoute
 
