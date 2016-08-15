@@ -1,4 +1,4 @@
-module Main exposing (main)
+module Main exposing (..)
 
 import Html exposing (node, div, button, text, h1, span, p, nav, footer, ul, li, a, input)
 import Html.App exposing (beginnerProgram)
