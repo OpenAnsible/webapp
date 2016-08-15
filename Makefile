@@ -6,7 +6,9 @@ STATIC_JS=assets/js
 
 default: elm
 
-elm: $(STATIC_JS) $(STATIC_JS)/elm.min.js.gz
+elm: $(STATIC_JS) $(STATIC_JS)/elm.js
+min: $(STATIC_JS) $(STATIC_JS)/elm.min.js
+gzip: $(STATIC_JS) $(STATIC_JS)/elm.min.js.gz
 
 $(STATIC_JS): $(STATIC_JS)
 	mkdir assets; cd assets; mkdir js;
@@ -18,10 +20,11 @@ $(STATIC_JS)/elm.min.js: $(STATIC_JS)/elm.js
 	$(SLIMIT) $(STATIC_JS)/elm.js > $(STATIC_JS)/elm.min.js
 
 $(STATIC_JS)/elm.js: $(ELM_SRC)/Main.elm
-	# cd $(ELM_SRC) && $(ELM) Main.elm --output=elm.js
 	$(ELM) $(ELM_SRC)/Main.elm --output=$(STATIC_JS)/elm.js
 
 .PHONY: clean
 
 clean:
 	rm $(ELM_SRC)/elm.js
+	rm $(ELM_SRC)/elm.min.js
+	rm $(ELM_SRC)/elm.min.js.gz
