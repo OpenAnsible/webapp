@@ -5,11 +5,10 @@ import Html exposing (node, div, button, text, h1, span, p, nav, footer, ul, li,
 import Html.Attributes exposing (class, style, href, type', rel, placeholder)
 import Html.Events exposing (onClick)
 
-import Models exposing (AppModel)
---import Messages exposing (Msg)
-import Messages exposing (..)
+import Models exposing (Model)
+import Messages exposing (Msg)
 
-view : AppModel -> Html.Html Msg
+view : Model -> Html.Html Msg
 view model =
         footer [class "footer"] [
             div [class "container"] [

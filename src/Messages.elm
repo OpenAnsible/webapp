@@ -1,4 +1,7 @@
---module Messages exposing ( Msg )
-module Messages exposing ( .. )
+module Messages exposing ( Msg(..) )
 
-type Msg   = ShowHome | ShowAbout | ShowNotFound
+
+type Msg
+    = ShowHome
+    | ShowAbout
+    | ShowNotFound
