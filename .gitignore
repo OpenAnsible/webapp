@@ -1,10 +1,12 @@
 # Project setting
 samples/
+
 assets/js/test.js
 elm-stuff/
 assets/js/elm.js
 assets/js/elm.min.js
 assets/js/elm.min.js.gz
+main
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
