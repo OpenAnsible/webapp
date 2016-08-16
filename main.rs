@@ -6,6 +6,12 @@ use std::thread;
 use std::boxed::Box;
 use std::str::from_utf8;
 
+// 编译
+//      brew install rust
+//      rustc main.rs
+//      ./main
+
+
 static ServerError: &'static str = "HTTP/1.1 500 Server Error\r\n\
 Server: Rust\r\n\
 Content-Type: text/html\r\n\
