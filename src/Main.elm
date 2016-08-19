@@ -1,12 +1,9 @@
 module Main exposing (..)
 
 import Debug
-import Html exposing (node, div, button, text, h1, span, p, nav, footer, ul, li, a, input)
-import Html.App exposing (beginnerProgram)
-import Html.Attributes exposing (class, style, href, type', rel, placeholder)
-import Html.Events exposing (onClick)
 
 import Navigation
+import Html.App exposing (beginnerProgram)
 
 import Models
 import Routes

@@ -14,12 +14,12 @@ view : Model -> Html.Html Msg
 view model =
     nav [class "navbar navbar-default navbar-fixed-top"] [
         div [class "container"] [
-            div [class "navbar-header"] [ a [class "navbar-brand", href "javascript:;", onClick ShowHome] [text "OpenAnsible"]],
+            div [class "navbar-header"] [ a [class "navbar-brand", href "javascript:;", onClick Messages.ShowHome] [text "OpenAnsible"]],
             ul [class "nav navbar-nav"] [
-                li [class (if model.route == Routes.HomeRoute then "active" else "")] [ a [href "javascript:;", onClick ShowHome] [text "探索"] ],
-                li [class (if model.route == Routes.AboutRoute then "active" else "")] [ a [href "javascript:;", onClick ShowAbout] [text "热门"] ],
-                li [class (if model.route == Routes.NotFoundRoute then "active" else "")] [ a [href "javascript:;", onClick ShowNotFound] [text "分类"] ],
-                li [class (if model.route == Routes.NotFoundRoute then "active" else "")] [ a [href "javascript:;", onClick ShowNotFound] [text "NotFound"] ]
+                li [class (if model.route == Routes.HomeRoute then "active" else "")] [ a [href "javascript:;", onClick Messages.ShowHome] [text "探索"] ],
+                li [class (if model.route == Routes.AboutRoute then "active" else "")] [ a [href "javascript:;", onClick Messages.ShowAbout] [text "热门"] ],
+                li [class (if model.route == Routes.NotFoundRoute then "active" else "")] [ a [href "javascript:;", onClick Messages.ShowNotFound] [text "分类"] ],
+                li [class (if model.route == Routes.NotFoundRoute then "active" else "")] [ a [href "javascript:;", onClick Messages.ShowNotFound] [text "NotFound"] ]
             ],
             div [class "navbar-form navbar-right"] [
                 div [class "form-group"] [input [type' "text", placeholder "Email", class "form-control"] []],

@@ -14,7 +14,7 @@ type Route
 
 matcherHome : Hop.Types.PathMatcher Route
 matcherHome =
-  match1 HomeRoute ""
+    match1 HomeRoute ""
 
 
 matchers : List (Hop.Types.PathMatcher Route)

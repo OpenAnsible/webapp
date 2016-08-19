@@ -1,9 +1,9 @@
 
 use std::fs::File;
-use std::io::{Read, Write};
-use std::net::{TcpListener, TcpStream};
-use std::thread;
 use std::boxed::Box;
+use std::io::{Read, Write};
+use std::thread;
+use std::net::{TcpListener}; // TcpStream
 use std::str::from_utf8;
 
 // 编译
@@ -11,8 +11,7 @@ use std::str::from_utf8;
 //      rustc main.rs
 //      ./main
 
-
-static ServerError: &'static str = "HTTP/1.1 500 Server Error\r\n\
+static SERVER_ERROR: &'static str = "HTTP/1.1 500 Server Error\r\n\
 Server: Rust\r\n\
 Content-Type: text/html\r\n\
 Content-Length: 18\r\n\r\n\
@@ -37,7 +36,7 @@ fn main() {
                 {}", body.len(), body)
         },
         Err(e) => {
-            ServerError.to_string()
+            SERVER_ERROR.to_string()
         }
     };
 
@@ -65,26 +64,29 @@ fn main() {
                                         body
                                     },
                                     Err(e) => {
-                                        stream.write_all(ServerError.as_bytes());
+                                        println!("Error: {:?}", e);
+                                        stream.write_all(SERVER_ERROR.as_bytes());
                                         return;
                                     }
                                 };
                                 stream.write_all(content.as_bytes());
                                 return;
                             }
-                            println!("{:?}", stream);
-                            println!("{:?} -> {:?}", 
-                                stream.peer_addr().unwrap(), 
-                                stream.local_addr().unwrap() );
+                            println!("{:?} -> {:?}", stream.peer_addr().unwrap(), 
+                                                     stream.local_addr().unwrap() );
+
                             stream.write_all(body_clone.as_bytes());
                         },
                         Err(e) => {
-                            stream.write_all(ServerError.as_bytes());
+                            println!("Error: {:?}", e);
+                            stream.write_all(SERVER_ERROR.as_bytes());
                         }
                     };
                 });
             }
-            Err(e) => { /* connection failed */ }
+            Err(e) => {
+                println!("Error: connection failed {:?}", e);
+            }
         }
     }
     
