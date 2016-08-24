@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh_CN">
 <head>
+    
     <meta name="renderer" content="webkit|ie-comp|ie-stand" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta charset="utf-8" />
@@ -15,7 +16,7 @@
     <link rel="stylesheet" type="text/css" href="/assets/css/common.css" />
     <link rel="stylesheet" type="text/css" href="/assets/css/main.css" />
 
-    <!-- <script type="text/javascript" src="/assets/js/jquery/jquery-1.12.3.min.js"></script> -->
+    <script type="text/javascript" src="/assets/js/jquery/jquery-1.12.3.min.js"></script>
 
     <!-- WebRTC 跨浏览器API兼容库 -->
     <script type="text/javascript" src="/assets/js/adapter-latest.js"></script>
@@ -29,10 +30,183 @@
 
     </div>
 
-    <script type="text/javascript">
-        Elm.Main.embed(document.getElementById('elm-container'));
-        // Elm.Main.fullscreen();
-    </script>
+    
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Chat</h3>
+        </div>
+        <div class="panel-body">
+            <video style="float: left" width=300 id="localVideo" autoplay muted></video>
+            <video style="float: left" width=600 id="remoteVideo" autoplay></video>
+            <div class="btn-group" role="group">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="input-group">
+                          <textarea type="text" 
+                            class="form-control" 
+                            id="sdp_input"
+                            placeholder="Remote SDP ..."></textarea>
+                          <span class="input-group-btn">
+                            <button class="btn btn-default" 
+                                id="callButton"
+                                type="button"
+                                onClick="javascript:Call();">Call</button>
+                          </span>
+                          <span class="input-group-btn">
+                          <button type="button" 
+                            disabled=false 
+                            class="btn btn-default" 
+                            id="hangupButton"
+                            onClick="javascript:hangup();">Hang Up</button>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">My Offer</h3>
+        </div>
+        <div class="panel-body" id="logs">
+
+        </div>
+    </div>
 </body>
 
+<script type="text/javascript">
+    Elm.Main.embed(document.getElementById('elm-container'));
+    // Elm.Main.fullscreen();
+</script>
+
+
+<script type="text/javascript">
+var callButton   = document.getElementById('callButton');
+var hangupButton = document.getElementById('hangupButton');
+
+callButton.disabled        = false;
+hangupButton.disabled      = false;
+
+var servers      = { "iceServers": [ {"urls": ["stun:104.155.239.54:3478" ] } ] };
+var offerOptions = { "offerToReceiveAudio": 1, "offerToReceiveVideo": 1 };
+
+
+navigator.mediaDevices.getUserMedia({"audio": true, "video": true})
+        .then(function (stream){
+            document.getElementById('localVideo').srcObject = stream;
+            init();
+        }).catch(function(e) {
+            alert('getUserMedia() error: ' + e.name);
+        });
+
+function Call(){
+    var _rsdp       = JSON.parse($('textarea').val()).sdp; // .replace(/\n/g, '\r\n')
+    var remote_sdp  = new RTCSessionDescription();
+    remote_sdp.type = "offer";
+    remote_sdp.sdp  = _rsdp;
+
+    pc2.setRemoteDescription(remote_sdp, 
+        function() {
+            
+        }, function (err){
+            console.error(err);
+        }
+    );
+    
+    pc2.createAnswer(function (desc){
+        pc2.setLocalDescription(desc, 
+            function() {
+
+            }, function (err){
+                console.error(err);
+            }
+        );
+
+        pc1.setRemoteDescription(desc, 
+            function() {
+
+            }, function (err){
+                console.error(err);
+            }
+        );
+    }, function (err){
+        console.error(err);
+    });
+}
+
+
+function init (){
+    var localStream = document.getElementById('localVideo').srcObject;
+    // var videoTracks = localStream.getVideoTracks();
+    // var audioTracks = localStream.getAudioTracks();
+
+    window.pc1 = new RTCPeerConnection(servers);  // local  peer connection
+    window.pc2 = new RTCPeerConnection(servers);  // remote peer connection
+
+    pc1.onicecandidate = function(e) {
+        // var candidate = JSON.stringify(e.candidate.toJSON());
+        pc2.addIceCandidate(new RTCIceCandidate(e.candidate),
+            function() {
+
+            },
+            function(err) {
+                console.error(err);
+            }
+        );
+    };
+    pc2.onicecandidate = function(e) {
+        // var candidate = JSON.stringify(e.candidate.toJSON());
+        pc1.addIceCandidate(new RTCIceCandidate(e.candidate),
+            function() {
+
+            },
+            function(err) {
+                console.error(err);
+            }
+        );
+    };
+
+    pc1.oniceconnectionstatechange = function(e) {
+        
+    };
+    pc2.oniceconnectionstatechange = function(e) {
+
+    };
+
+    pc2.onaddstream = function (e){
+        document.getElementById('remoteVideo').srcObject = e.stream;
+    };
+
+    pc1.addStream(localStream);
+
+    pc1.createOffer(function (desc){
+
+        console.log("Local Offer: ");
+        console.info(JSON.stringify(desc));
+
+        $("#logs").append($("<p><code>"+JSON.stringify(desc)+"</code></p>"));
+        pc1.setLocalDescription(desc, 
+            function() {
+
+            }, function (err){
+                console.error(err);
+            }
+        );
+    }, function (err){
+        console.error(err);
+    }, offerOptions);
+}
+
+function hangup(){
+    pc1.close();
+    pc2.close();
+    pc1 = null;
+    pc2 = null;
+}
+</script>
 </html>
