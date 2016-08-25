@@ -25,26 +25,26 @@ fn main() {
     println!("HTTP Server running on {}", address);
 
     // index.html
-    let response = match File::open("index.html") {
-        Ok(mut file) => {
-            let mut body = String::new();
-            let _ = file.read_to_string(&mut body);
-            format!("HTTP/1.1 200 OK\r\n\
-                Server: Rust/1.0\r\n\
-                Content-Type: text/html\r\n\
-                Content-Length: {}\r\n\r\n\
-                {}", body.len(), body)
-        },
-        Err(e) => {
-            SERVER_ERROR.to_string()
-        }
-    };
+    // let response = match File::open("index.html") {
+    //     Ok(mut file) => {
+    //         let mut body = String::new();
+    //         let _ = file.read_to_string(&mut body);
+    //         format!("HTTP/1.1 200 OK\r\n\
+    //             Server: Rust/1.0\r\n\
+    //             Content-Type: text/html\r\n\
+    //             Content-Length: {}\r\n\r\n\
+    //             {}", body.len(), body)
+    //     },
+    //     Err(e) => {
+    //         SERVER_ERROR.to_string()
+    //     }
+    // };
 
     
-    let body = Box::new(response);
+    // let body = Box::new(response);
     // accept connections and process them, spawning a new thread for each one
     for stream in listener.incoming() {
-        let body_clone = body.clone();
+        // let body_clone = body.clone();
         match stream {
             Ok(mut stream) => {
                 thread::spawn(move|| {
@@ -74,8 +74,21 @@ fn main() {
                             }
                             println!("{:?} -> {:?}", stream.peer_addr().unwrap(), 
                                                      stream.local_addr().unwrap() );
-
-                            stream.write_all(body_clone.as_bytes());
+                            let index_html = match File::open("index.html") {
+                                Ok(mut file) => {
+                                    let mut body = String::new();
+                                    let _ = file.read_to_string(&mut body);
+                                    format!("HTTP/1.1 200 OK\r\n\
+                                        Server: Rust/1.0\r\n\
+                                        Content-Type: text/html\r\n\
+                                        Content-Length: {}\r\n\r\n\
+                                        {}", body.len(), body)
+                                },
+                                Err(e) => {
+                                    SERVER_ERROR.to_string()
+                                }
+                            };
+                            stream.write_all(index_html.as_bytes());
                         },
                         Err(e) => {
                             println!("Error: {:?}", e);
