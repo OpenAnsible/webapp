@@ -11,18 +11,18 @@
 
     <title>OpenAnsible Web Application</title>
 
-    <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-theme.min.css" />
-    <link rel="stylesheet" type="text/css" href="/assets/css/common.css" />
-    <link rel="stylesheet" type="text/css" href="/assets/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap-theme.min.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/common.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/main.css" />
 
-    <script type="text/javascript" src="/assets/js/jquery/jquery-1.12.3.min.js"></script>
+    <script type="text/javascript" src="assets/js/jquery/jquery-1.12.3.min.js"></script>
 
     <!-- WebRTC 跨浏览器API兼容库 -->
-    <script type="text/javascript" src="/assets/js/adapter-latest.js"></script>
-    <script type="text/javascript" src="/assets/js/webrtc.js"></script>
+    <script type="text/javascript" src="assets/js/adapter-latest.js"></script>
+    <script type="text/javascript" src="assets/js/webrtc.js"></script>
 
-    <script type="text/javascript" src="/assets/js/elm.js"></script>
+    <script type="text/javascript" src="assets/js/elm.js"></script>
 </head>
 
 <body>
@@ -33,48 +33,58 @@
     
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Chat</h3>
+            <h3 class="panel-title">Face Time</h3>
         </div>
         <div class="panel-body">
-            <video style="float: left" width=300 id="localVideo" autoplay muted></video>
-            <video style="float: left" width=600 id="remoteVideo" autoplay></video>
-            <div class="btn-group" role="group">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="input-group">
-                          <textarea type="text" 
-                            class="form-control" 
-                            id="sdp_input"
-                            placeholder="Remote SDP ..."></textarea>
-                          <span class="input-group-btn">
-                            <button class="btn btn-default" 
-                                id="callButton"
-                                type="button"
-                                onClick="javascript:Call();">Call</button>
-                          </span>
-                          <span class="input-group-btn">
-                          <button type="button" 
-                            disabled=false 
-                            class="btn btn-default" 
-                            id="hangupButton"
-                            onClick="javascript:hangup();">Hang Up</button>
-                            </span>
-                        </div>
-                    </div>
-
-                </div>
-
-                
+            <div class="left" style="float: left">
+                <video style="float: left" width=300 
+                    id="localVideo" autoplay muted></video>
+                <video style="float: left" width=600 
+                    id="remoteVideo" autoplay></video>
+            </div>
+            <div class="right" style="float: right">
+                <h3>Peers <button class="btn btn-info" id="fetchPeers"
+                            onClick="javascript:fetch_peers();">刷新</button> </h3>
+                <ul class="list-group" id="peers">
+                    
+                </ul>
             </div>
         </div>
     </div>
 
-    <div class="panel panel-default">
+    <div class="panel panel-default" style="padding-bottom: 60px;">
         <div class="panel-heading">
-            <h3 class="panel-title">My Offer</h3>
+            <h3 class="panel-title">Text Chat</h3>
         </div>
         <div class="panel-body" id="logs">
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <p><span>57be05946434316769b8897d</span>:<code>hello</code></p>
+                </li>
+                <li class="list-group-item">
+                    <p><span>57be05946434316769b8897d</span>:<code>Hi</code></p>
+                </li>
+            </ul>
+            <div class="btn-group" role="group">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="input-group">
+                          <input type="text" 
+                            class="form-control" 
+                            id="message_input"
+                            placeholder="message ..." />
+                        
+                          <span class="input-group-btn">
+                            <button class="btn btn-default" 
+                                id="callButton"
+                                type="button"
+                                onClick="javascript:send();">Send</button>
+                          </span>
+                        </div>
+                    </div>
 
+                </div>
+            </div>
         </div>
     </div>
 </body>
@@ -86,127 +96,136 @@
 
 
 <script type="text/javascript">
-var callButton   = document.getElementById('callButton');
-var hangupButton = document.getElementById('hangupButton');
-
-callButton.disabled        = false;
-hangupButton.disabled      = false;
 
 var servers      = { "iceServers": [ {"urls": ["stun:104.155.239.54:3478" ] } ] };
 var offerOptions = { "offerToReceiveAudio": 1, "offerToReceiveVideo": 1 };
+    
+window.peer = new RTCPeerConnection(servers);
+window.peer.onaddstream = function (e) {
+    document.getElementById('remoteVideo').srcObject = e.stream;
+};
 
+var socket = new WebSocket("ws://104.155.239.54:3012", []);
 
-navigator.mediaDevices.getUserMedia({"audio": true, "video": true})
+socket.onmessage = function (event) {
+    var msg = JSON.parse(event.data);
+    if ( msg.id == 'fetch_peers' ) {
+        return this.onnames( msg.result );
+    }
+
+    if ( msg.event == 'sdp' ) {
+        var _sdp = JSON.parse(msg.content);
+        var sdp  = new RTCSessionDescription();
+        sdp.type = _sdp.type;
+        sdp.sdp  = _sdp.sdp;
+
+        if ( sdp.type == 'offer' ) {
+            window.peer.setRemoteDescription(sdp, 
+                function() {
+                    window.peer.createAnswer(function (desc){
+                        // send_answer(from, desc);
+                        window.peer.setLocalDescription(desc, function(){
+                            var _msg = {
+                                "id": "send_answer", "event": "sdp", 
+                                "target": msg.from, "content": JSON.stringify(window.peer.localDescription) 
+                            };
+                            socket.send(JSON.stringify(_msg));
+                            self_view();
+                        }, function (){
+
+                        });
+                    }, function (err){
+                        console.error(err);
+                    });
+                }, function (err){
+                    console.error(err);
+                }
+            );
+        } else if ( sdp.type == 'answer' ){
+            window.peer.setRemoteDescription(sdp, function (e){
+                console.info("recevived answer.");
+                console.log(e)
+            }, function (err){
+
+            });
+        }
+    } else if ( msg.event == 'candidate' ) {
+        // addIceCandidate
+        if ( msg.content === 'null' ) msg.content = null;
+
+        var candidate = new RTCIceCandidate( JSON.parse(msg.content) );
+        window.peer.addIceCandidate(candidate, function (){}, function (){});
+    }
+};
+socket.onnames = function (result){
+    var peers = result;
+    var peers_dom = peers.map(function (peer_id, i){
+        return $(
+            '<li class="list-group-item" data-peer_id="#PEER_ID#">#PEER_ID#<button class="btn btn-success" onclick="javascript:Call.bind(this)(\'#PEER_ID#\');">Call</button> </li>'
+            .replace("#PEER_ID#", peer_id)
+            .replace("#PEER_ID#", peer_id)
+            .replace("#PEER_ID#", peer_id)
+        );
+    })
+    $("#peers").empty().append(peers_dom);
+};
+
+function send() {
+    var input = document.getElementById("message_input");
+    socket.send(input.value);
+    input.value = "";
+}
+
+function fetch_peers(){
+    socket.send(JSON.stringify({"id": "fetch_peers", "event": "cmd", "content": "peers"}));
+}
+
+function self_view(){
+    window.navigator.mediaDevices.getUserMedia({"audio": true, "video": true})
         .then(function (stream){
             document.getElementById('localVideo').srcObject = stream;
-            init();
+            // if (stream.getAudioTracks().length > 0)
+            //     window.peer.addTrack(stream.getAudioTracks()[0], stream);
+            // if (stream.getVideoTracks().length > 0)
+            //     window.peer.addTrack(stream.getVideoTracks()[0], stream);
+            window.peer.addStream(stream);
         }).catch(function(e) {
-            alert('getUserMedia() error: ' + e.name);
+            console.error(e);
         });
+}
+function Call(peer_id){
+    self_view();
 
-function Call(){
-    var _rsdp       = JSON.parse($('textarea').val()).sdp; // .replace(/\n/g, '\r\n')
-    var remote_sdp  = new RTCSessionDescription();
-    remote_sdp.type = "offer";
-    remote_sdp.sdp  = _rsdp;
+    window.peer.onicecandidate = function(e) {
+        if (!e || !e.candidate) return;
+        var msg = {
+            "id": "candidate", "event": "candidate", "target": peer_id,
+            "content": JSON.stringify(e.candidate)
+        };
+        socket.send(JSON.stringify(msg));
+    };
 
-    pc2.setRemoteDescription(remote_sdp, 
-        function() {
-            
+    window.peer.onnegotiationneeded = function (e){
+        console.info("createOffer ...");
+        window.peer.createOffer(function (desc){
+            window.peer.setLocalDescription(desc, 
+                function() {
+                    var msg = {
+                        "id": "send_offer", "event": "sdp", 
+                        "target": peer_id, "content": JSON.stringify(window.peer.localDescription) 
+                    };
+                    socket.send(JSON.stringify(msg));
+                }, function (err){
+                    console.error(err);
+                }
+            );
         }, function (err){
             console.error(err);
-        }
-    );
+        }, offerOptions);
+    };
+
     
-    pc2.createAnswer(function (desc){
-        pc2.setLocalDescription(desc, 
-            function() {
-
-            }, function (err){
-                console.error(err);
-            }
-        );
-
-        pc1.setRemoteDescription(desc, 
-            function() {
-
-            }, function (err){
-                console.error(err);
-            }
-        );
-    }, function (err){
-        console.error(err);
-    });
 }
-
-
-function init (){
-    var localStream = document.getElementById('localVideo').srcObject;
-    // var videoTracks = localStream.getVideoTracks();
-    // var audioTracks = localStream.getAudioTracks();
-
-    window.pc1 = new RTCPeerConnection(servers);  // local  peer connection
-    window.pc2 = new RTCPeerConnection(servers);  // remote peer connection
-
-    pc1.onicecandidate = function(e) {
-        // var candidate = JSON.stringify(e.candidate.toJSON());
-        pc2.addIceCandidate(new RTCIceCandidate(e.candidate),
-            function() {
-
-            },
-            function(err) {
-                console.error(err);
-            }
-        );
-    };
-    pc2.onicecandidate = function(e) {
-        // var candidate = JSON.stringify(e.candidate.toJSON());
-        pc1.addIceCandidate(new RTCIceCandidate(e.candidate),
-            function() {
-
-            },
-            function(err) {
-                console.error(err);
-            }
-        );
-    };
-
-    pc1.oniceconnectionstatechange = function(e) {
-        
-    };
-    pc2.oniceconnectionstatechange = function(e) {
-
-    };
-
-    pc2.onaddstream = function (e){
-        document.getElementById('remoteVideo').srcObject = e.stream;
-    };
-
-    pc1.addStream(localStream);
-
-    pc1.createOffer(function (desc){
-
-        console.log("Local Offer: ");
-        console.info(JSON.stringify(desc));
-
-        $("#logs").append($("<p><code>"+JSON.stringify(desc)+"</code></p>"));
-        pc1.setLocalDescription(desc, 
-            function() {
-
-            }, function (err){
-                console.error(err);
-            }
-        );
-    }, function (err){
-        console.error(err);
-    }, offerOptions);
-}
-
-function hangup(){
-    pc1.close();
-    pc2.close();
-    pc1 = null;
-    pc2 = null;
-}
+setTimeout(fetch_peers, 1000);
 </script>
 </html>
