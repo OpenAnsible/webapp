@@ -108,17 +108,26 @@ if ( location.protocol == 'https:' ) {
 }
 
 window.socket = new WebSocket(window.websocket_uri, []);
-socket.onopen = function (){
+window.socket.onopen  = socket_onopen;
+window.socket.onclose = socket_onclose;
+window.socket.onerror = socket_onerror;
+window.socket.onmessage = socket_onmessage;
+
+socket_onopen = function (){
     fetch_peers();
 
 };
-socket.onclose = function (){
+socket_onclose = function (){
     window.socket = new WebSocket(window.websocket_uri, []);
+    window.socket.onopen  = socket_onopen;
+    window.socket.onclose = socket_onclose;
+    window.socket.onerror = socket_onerror;
+    window.socket.onmessage = socket_onmessage;
 };
-socket.onerror = function (){
+socket_onerror = function (){
     alert("WebSocket Error.");
 };
-socket.onmessage = function (event) {
+socket_onmessage = function (event) {
     var msg = JSON.parse(event.data);
     if ( msg.id == 'fetch_peers' ) {
         var peers_dom = msg.result.map(function (peer_id, i){
