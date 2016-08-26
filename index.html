@@ -208,7 +208,12 @@ function onKeyPress(e){
     }
 }
 function fetch_peers(){
-    socket.send(JSON.stringify({"id": "fetch_peers", "event": "cmd", "content": "peers"}));
+    try{
+        socket.send(JSON.stringify({"id": "fetch_peers", "event": "cmd", "content": "peers"}));
+    }catch(e){
+
+    }
+    setTimeout(fetch_peers, 1000);
 }
 
 function self_view(){
