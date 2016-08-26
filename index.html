@@ -56,14 +56,9 @@
         <div class="panel-heading">
             <h3 class="panel-title">Text Chat</h3>
         </div>
-        <div class="panel-body" id="logs">
-            <ul class="list-group">
-                <li class="list-group-item">
-                    <p><span>57be05946434316769b8897d</span>:<code>hello</code></p>
-                </li>
-                <li class="list-group-item">
-                    <p><span>57be05946434316769b8897d</span>:<code>Hi</code></p>
-                </li>
+        <div class="panel-body">
+            <ul class="list-group" id="messages">
+
             </ul>
             <div class="btn-group" role="group">
                 <div class="row">
@@ -72,7 +67,8 @@
                           <input type="text" 
                             class="form-control" 
                             id="message_input"
-                            placeholder="message ..." />
+                            placeholder="message ..."
+                            onkeypress="return onKeyPress(event)" />
                         
                           <span class="input-group-btn">
                             <button class="btn btn-default" 
@@ -105,12 +101,36 @@ window.peer.onaddstream = function (e) {
     document.getElementById('remoteVideo').srcObject = e.stream;
 };
 
-var socket = new WebSocket("ws://104.155.239.54:3012", []);
+if ( location.protocol == 'https:' ) {
+    window.websocket_uri = "wss://" + location.host + "/websocket";
+} else {
+    window.websocket_uri = "ws://" + location.hostname + ":3012";
+}
 
+window.socket = new WebSocket(window.websocket_uri, []);
+socket.onopen = function (){
+    fetch_peers();
+
+};
+socket.onclose = function (){
+    window.socket = new WebSocket(window.websocket_uri, []);
+};
+socket.onerror = function (){
+    alert("WebSocket Error.");
+};
 socket.onmessage = function (event) {
     var msg = JSON.parse(event.data);
     if ( msg.id == 'fetch_peers' ) {
-        return this.onnames( msg.result );
+        var peers_dom = msg.result.map(function (peer_id, i){
+            return $(
+                '<li class="list-group-item" data-peer_id="#PEER_ID#">#PEER_ID#<button class="btn btn-success" onclick="javascript:Call.bind(this)(\'#PEER_ID#\');">Call</button> </li>'
+                .replace("#PEER_ID#", peer_id)
+                .replace("#PEER_ID#", peer_id)
+                .replace("#PEER_ID#", peer_id)
+            );
+        })
+        $("#peers").empty().append(peers_dom);
+        return;
     }
 
     if ( msg.event == 'sdp' ) {
@@ -123,7 +143,6 @@ socket.onmessage = function (event) {
             window.peer.setRemoteDescription(sdp, 
                 function() {
                     window.peer.createAnswer(function (desc){
-                        // send_answer(from, desc);
                         window.peer.setLocalDescription(desc, function(){
                             var _msg = {
                                 "id": "send_answer", "event": "sdp", 
@@ -150,32 +169,34 @@ socket.onmessage = function (event) {
             });
         }
     } else if ( msg.event == 'candidate' ) {
-        // addIceCandidate
-        if ( msg.content === 'null' ) msg.content = null;
-
         var candidate = new RTCIceCandidate( JSON.parse(msg.content) );
         window.peer.addIceCandidate(candidate, function (){}, function (){});
+    } else if ( msg.event == 'msg' ) {
+        var inbox = $("#messages");
+        var template = '<li class="list-group-item"><p>'
+                     +  '<span>#FROM#</span>:'
+                     +  '<code>#CONTENT#</code>'
+                     +  '</li>'
+        template = template.replace("#FROM#", msg.from).replace("#CONTENT#", msg.content);
+        inbox.append($(template));
     }
-};
-socket.onnames = function (result){
-    var peers = result;
-    var peers_dom = peers.map(function (peer_id, i){
-        return $(
-            '<li class="list-group-item" data-peer_id="#PEER_ID#">#PEER_ID#<button class="btn btn-success" onclick="javascript:Call.bind(this)(\'#PEER_ID#\');">Call</button> </li>'
-            .replace("#PEER_ID#", peer_id)
-            .replace("#PEER_ID#", peer_id)
-            .replace("#PEER_ID#", peer_id)
-        );
-    })
-    $("#peers").empty().append(peers_dom);
 };
 
 function send() {
-    var input = document.getElementById("message_input");
-    socket.send(input.value);
+    var input   = document.getElementById("message_input");
+    var _msg    = {
+        "id": Math.random().toString(), "target": null, 
+        "event": "msg", "content": input.value
+    };
+    socket.send(JSON.stringify(_msg));
     input.value = "";
 }
 
+function onKeyPress(e){
+    if ( e.keyCode == 13 ) {
+        send();
+    }
+}
 function fetch_peers(){
     socket.send(JSON.stringify({"id": "fetch_peers", "event": "cmd", "content": "peers"}));
 }
@@ -226,6 +247,5 @@ function Call(peer_id){
 
     
 }
-setTimeout(fetch_peers, 1000);
 </script>
 </html>
